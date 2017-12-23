@@ -40,10 +40,10 @@ class TalkingClock(object):
         5: " fifty",
     }
 
-    def talking_clock(self, time):
+    def time_string_to_words(self, time):
         try:
             hour, minutes = [int(x) for x in time.split(":")]
-        except ValueError: 
+        except ValueError:
             raise ValueError("Time not in format 'HH:MM'")
 
         output = "It's"
@@ -63,7 +63,7 @@ class TalkingClock(object):
             if minutes % 10:
                 output += self.number_to_word[ones]
 
-        return output + period 
+        return output + period
 
     def time_to_speech(self, sentance):
         word_to_number = {v[1:]: str(k) for k, v in self.number_to_word.iteritems()}
@@ -72,44 +72,31 @@ class TalkingClock(object):
 
         sentance = sentance.split()
 
-        sounds_to_play = ["its"]
+        sounds_to_play = ["HOUR1", "its"]
         am_or_pm = sentance[-1]
+        above_12 = False
 
-        if len(sentance) == 3:
-            sounds_to_play.append(word_to_number[sentance[1]])
+        sounds_to_play.append(word_to_number[sentance[1]])
 
-        elif len(sentance) == 4:
-            sounds_to_play.append(word_to_number[sentance[1]])
+        for i in ["ty", "teen"]:
+            if sentance[2].endswith(i):
+                sounds_to_play.append(sentance[2].split(i)[0])
+                sounds_to_play.append(i)
+                above_12 = True
 
-            if sentance[2].endswith("ty"):
-                sounds_to_play.append(sentance[2].split("ty")[0])
-                sounds_to_play.append("ty")
+        if len(sentance) == 4 and not above_12:  # mins in [10 - 12]
+            sounds_to_play.append(word_to_number[sentance[2]])
 
-            elif sentance[2].endswith("teen"):
-                sounds_to_play.append(sentance[2].split("teen")[0])
-                sounds_to_play.append("teen")
-
-            else: 
-                sounds_to_play.append(word_to_number[sentance[2]])
-                
-
-        elif len(sentance) == 5:
-            sounds_to_play.append(word_to_number[sentance[1]])
-
-            if sentance[2].endswith("ty"):
-                sounds_to_play.append(sentance[2].split("ty")[0])
-                sounds_to_play.append("ty")
-
-            elif sentance[2] == "oh":
+        if len(sentance) == 5:
+            if sentance[2] == "oh":  # ex. It's nine oh five am
                 sounds_to_play.append("o")
-
             sounds_to_play.append(word_to_number[sentance[3]])
 
         sounds_to_play.append(am_or_pm)
+        sounds_to_play.append("hour2")
 
         for i in sounds_to_play:
             self.play_sounds(os.path.join(directory, "sound_clips", i + ".wav"))
-
 
     @staticmethod
     def play_sounds(sound_path):
@@ -124,7 +111,7 @@ class TalkingClock(object):
 
         data = f.readframes(chunk)
 
-        while data: 
+        while data:
             stream.write(data)
             data = f.readframes(chunk)
 
@@ -134,10 +121,10 @@ class TalkingClock(object):
 
 
 if __name__ == '__main__':
-    talker = TalkingClock()
+    Talker = TalkingClock()
 
     time = datetime.datetime.now().strftime("%H:%M")
 
-    sentance = talker.talking_clock(time)
-    talker.time_to_speech(sentance)
+    sentance = Talker.time_string_to_words(time)
+    Talker.time_to_speech(sentance)
 
