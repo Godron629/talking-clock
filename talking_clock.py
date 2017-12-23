@@ -1,6 +1,7 @@
 import os
 import pyaudio
 import wave
+import datetime
 
 number_to_word = {
     0: " twelve",
@@ -69,8 +70,6 @@ def time_to_speech(sentance):
     word_to_number = {v[1:]: str(k) for k, v in number_to_word.iteritems()}
 
     directory = os.path.dirname(os.path.realpath(__file__))
-    sound_clips_directory = os.path.join(directory, "sound_clips")
-    sound_clips = os.listdir(sound_clips_directory)
 
     sentance = sentance.split()
 
@@ -78,56 +77,39 @@ def time_to_speech(sentance):
     am_or_pm = sentance[-1]
 
     if len(sentance) == 3:
-        number = word_to_number[sentance[1]]
-        sounds_to_play.append(number)
-        sounds_to_play.append(sentance[2])
+        sounds_to_play.append(word_to_number[sentance[1]])
 
-    if len(sentance) == 4:
+    elif len(sentance) == 4:
+        sounds_to_play.append(word_to_number[sentance[1]])
+
         if sentance[2].endswith("ty"):
-            number = word_to_number[sentance[1]]
-            sounds_to_play.append(number)
-            tens = sentance[2].split("ty")[0]
-            sounds_to_play.append(tens)
+            sounds_to_play.append(sentance[2].split("ty")[0])
             sounds_to_play.append("ty")
-            sounds_to_play.append(sentance[3])
 
         elif sentance[2].endswith("teen"):
-            number = word_to_number[sentance[1]]
-            sounds_to_play.append(number)
-            teen = sentance[2].split("teen")[0]
-            sounds_to_play.append(teen)
+            sounds_to_play.append(sentance[2].split("teen")[0])
             sounds_to_play.append("teen")
-            sounds_to_play.append(sentance[3])
 
         else: 
-            number = word_to_number[sentance[1]]
-            sounds_to_play.append(number)
             sounds_to_play.append(word_to_number[sentance[2]])
-            sounds_to_play.append(sentance[3])
             
 
-    if len(sentance) == 5:
+    elif len(sentance) == 5:
+        sounds_to_play.append(word_to_number[sentance[1]])
+
         if sentance[2].endswith("ty"):
-            number = word_to_number[sentance[1]]
-            sounds_to_play.append(number)
-            tens = sentance[2].split("ty")[0]
-            sounds_to_play.append(tens)
+            sounds_to_play.append(sentance[2].split("ty")[0])
             sounds_to_play.append("ty")
-            sounds_to_play.append(sentance[3])
-            sounds_to_play.append(sentance[4])
+
         elif sentance[2] == "oh":
-            number = word_to_number[sentance[1]]
-            sounds_to_play.append(number)
             sounds_to_play.append("o")
-            sounds_to_play.append(word_to_number[sentance[3]])
-            sounds_to_play.append(sentance[4])
 
+        sounds_to_play.append(word_to_number[sentance[3]])
 
-        
-        
+    sounds_to_play.append(am_or_pm)
 
     for i in sounds_to_play:
-        play_sounds(os.path.join(sound_clips_directory, i + ".wav"))
+        play_sounds(os.path.join(directory, "sound_clips", i + ".wav"))
 
 
 def play_sounds(sound_path):
