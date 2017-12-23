@@ -1,3 +1,7 @@
+import os
+import pyaudio
+import wave
+
 def talking_clock(time):
 	number_to_word = {
 		0: " twelve",
@@ -57,7 +61,41 @@ def talking_clock(time):
 
 	return output + period 
 
+def time_to_speech(sentance):
+
+    directory = os.path.dirname(os.path.realpath(__file__))
+    sound_clips_directory = os.path.join(directory, "sound_clips")
+    sound_clips = os.listdir(sound_clips_directory)
+
+    sentance = sentance.split()
+
+    play_sounds(os.path.join(sound_clips_directory, "HOUR1.WAV"))
+
+
+def play_sounds(sound_path):
+    chunk = 1024
+    f = wave.open(sound_path, "rb")
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format=p.get_format_from_width(f.getsampwidth()),
+                    channels=f.getnchannels(),
+                    rate = f.getframerate(),
+                    output=True)
+
+    data = f.readframes(chunk)
+
+    while data: 
+        stream.write(data)
+        data = f.readframes(chunk)
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
 
 if __name__ == '__main__':
-	time = "1:59"
-	print talking_clock(time)
+    time = "1:59"
+    sentance = talking_clock(time)
+    print sentance
+    time_to_speech(sentance)
+
