@@ -41,6 +41,12 @@ class TalkingClock(object):
     }
 
     def time_string_to_words(self, time):
+        """
+        Time String to Words
+        --------------------
+        Convert time string in format HH:MM to its english
+        speaking equivalent
+        """
         try:
             hour, minutes = [int(x) for x in time.split(":")]
         except ValueError:
@@ -66,6 +72,13 @@ class TalkingClock(object):
         return output + period
 
     def time_to_speech(self, sentance):
+        """
+        Time to Speech
+        --------------
+        If possible, queue sound files according to sentance.
+        Then, say the sentance out loud (uses speakers).
+        """
+        # Invert: Keys become values, values become keys
         word_to_number = {v[1:]: str(k) for k, v in self.number_to_word.iteritems()}
 
         directory = os.path.dirname(os.path.realpath(__file__))
@@ -76,21 +89,21 @@ class TalkingClock(object):
         am_or_pm = sentance[-1]
         above_12 = False
 
-        sounds_to_play.append(word_to_number[sentance[1]])
+        sounds_to_play.append(word_to_number[sentance[1]])  # It's 'nine' thirty
 
         for i in ["ty", "teen"]:
-            if sentance[2].endswith(i):
+            if sentance[2].endswith(i):  # It's ten ['thirty', 'thirteen', ... ]
                 sounds_to_play.append(sentance[2].split(i)[0])
                 sounds_to_play.append(i)
                 above_12 = True
 
-        if len(sentance) == 4 and not above_12:  # mins in [10 - 12]
+        if len(sentance) == 4 and not above_12:  # It's five ['ten', 'eleven', 'twelve']
             sounds_to_play.append(word_to_number[sentance[2]])
 
         if len(sentance) == 5:
-            if sentance[2] == "oh":  # ex. It's nine oh five am
+            if sentance[2] == "oh":  # ex. It's nine 'oh' five am
                 sounds_to_play.append("o")
-            sounds_to_play.append(word_to_number[sentance[3]])
+            sounds_to_play.append(word_to_number[sentance[3]])  # It's nine twenty 'five' am
 
         sounds_to_play.append(am_or_pm)
         sounds_to_play.append("hour2")
